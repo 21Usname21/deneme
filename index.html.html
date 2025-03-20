@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Çembersel Hareket Testi</title>
+<style>
+body {
+font-family: sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+margin: 0;
+background-image: url('arkaplan.jpg'); /* Arka plan resminin URL'sini buraya yapıştırın */
+background-size: cover;
+background-repeat: no-repeat;
+}
+.container {
+background-color: rgba(255, 255, 255, 0.8); /* Yarı saydam beyaz arka plan */
+padding: 30px;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+text-align: center;
+max-width: 800px; /* İçeriğin çok geniş olmasını engeller */
+width: 90%; /* Mobil uyumluluk için genişliği ayarlar */
+}
+#soru-alani {
+font-size: 1.2em;
+margin-bottom: 20px;
+}
+.secenekler {
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+margin-bottom: 15px;
+}
+.secenek {
+margin-bottom: 10px;
+}
+.secenek input {
+margin-right: 5px;
+}
+#cevap-alani button {
+padding: 10px 20px;
+cursor: pointer;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 1em;
+}
+#cevap-alani button:hover {
+background-color: #0056b3;
+}
+#sonuc {
+margin-top: 15px;
+font-weight: bold;
+}
+#sonraki-soru {
+padding: 10px 20px;
+cursor: pointer;
+background-color: #28a745;
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 1em;
+margin-top: 20px;
+}
+#sonraki-soru:disabled {
+background-color: #6c757d;
+cursor: not-allowed;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="soru-alani"></div>
+<div id="cevap-alani">
+<div class="secenekler">
+<div class="secenek"><input type="radio" name="cevap" value="A" id="secenekA"><label for="secenekA" id="labelA"></label></div>
+<div class="secenek"><input type="radio" name="cevap" value="B" id="secenekB"><label for="secenekB" id="labelB"></label></div>
+<div class="secenek"><input type="radio" name="cevap" value="C" id="secenekC"><label for="secenekC" id="labelC"></label></div>
+<div class="secenek"><input type="radio" name="cevap" value="D" id="secenekD"><label for="secenekD" id="labelD"></label></div>
+<div class="secenek"><input type="radio" name="cevap" value="E" id="secenekE"><label for="secenekE" id="labelE"></label></div>
+</div>
+<button onclick="kontrolEt()">Cevabı Kontrol Et</button>
+<p id="sonuc"></p>
+</div>
+<button id="sonraki-soru" onclick="sonrakiSoru()" disabled>Sonraki Soru</button>
+</div>
+<script>
+console.log('JavaScript Çalışıyor!');
+const sorular = [
+{
+soru: "1. Sabit süratle çembersel hareket yapan bir cismin hangi vektörel büyüklüğü sürekli değişir?",
+secenekler: { A: "Sürat", B: "Kütle", C: "Hız", D: "Enerji", E: "Yarıçap" },
+cevap: "C"
+},
+{
+soru: "2. Çembersel hareketin oluşması için hangi yönde bir net kuvvet gereklidir?",
+secenekler: { A: "Dışa doğru", B: "İleri doğru", C: "Merkeze doğru", D: "Geriye doğru", E: "Aşağı doğru" },
+cevap: "C"
+},
+{
+soru: "3. Düzgün çembersel harekette merkezcil ivmenin yönü nasıldır?",
+secenekler: { A: "Yörüngeye teğet", B: "Hareket yönünde", C: "Merkeze doğru", D: "Merkezden dışa doğru", E: "Sabit ve sıfır" },
+cevap: "C"
+},
+{
+soru: "4. Bir cismi çembersel bir yörüngede tutan kuvvete ne ad verilir?",
+secenekler: { A: "Yerçekimi kuvveti", B: "Sürtünme kuvveti", C: "Merkezcil kuvvet", D: "Normal kuvvet", E: "Elektriksel kuvvet" },
+cevap: "C"
+},
+{
+soru: "5. Merkezcil kuvvetin büyüklüğü hangi niceliklere bağlıdır?",
+secenekler: { A: "Sadece kütle ve hız", B: "Sadece hız ve yarıçap", C: "Kütle, hız ve yarıçap", D: "Sadece kütle ve yarıçap", E: "Sadece kütle" },
+cevap: "C"
+},
+{
+soru: "6. Çembersel yörüngenin yarıçapı artarsa, aynı süratteki bir cismin merkezcil ivmesi nasıl değişir?",
+secenekler: { A: "Artar", B: "Azalır", C: "Değişmez", D: "Sıfır olur", E: "Önce artar sonra azalır" },
+cevap: "B"
+},
+{
+soru: "7. Çembersel hareket yapan bir cismin periyodu ne anlama gelir?",
+secenekler: { A: "Bir saniyedeki tur sayısı", B: "Toplam tur sayısı", C: "Bir tam tur için geçen süre", D: "Açısal hızdaki değişim", E: "Merkezcil ivmedeki değişim" },
+cevap: "C"
+},
+{
+soru: "8. Çembersel hareket yapan bir cismin frekansı ne anlama gelir?",
+secenekler: { A: "Bir tam tur için geçen süre", B: "Toplam süre", C: "Birim zamandaki tur sayısı", D: "Çembersel yörüngenin uzunluğu", E: "Merkezcil kuvvetin büyüklüğü" },
+cevap: "C"
+},
+{
+soru: "9. Periyot ile frekans arasındaki matematiksel ilişki nedir?",
+secenekler: { A: "T = f", B: "T = 1/f", C: "T = f²", D: "T = √f", E: "T = 2f" },
+cevap: "B"
+},
+{
+soru: "10. Açısal hızın birimi nedir?",
+secenekler: { A: "m/s", B: "m/s²", C: "radyan/saniye", D: "Newton", E: "Joule" },
+cevap: "C"
+},
+{
+soru: "11. Doğrusal hız ile açısal hız arasındaki ilişki nedir?",
+secenekler: { A: "v = ω/r", B: "v = ω + r", C: "v = ωr", D: "v = r/ω", E: "v = ω - r" },
+cevap: "C"
+},
+{
+soru: "12. Merkezcil ivme ile açısal hız arasındaki ilişki nedir?",
+secenekler: { A: "a = ωr", B: "a = ω/r", C: "a = ω²r", D: "a = ω/r²", E: "a = ω²r²" },
+cevap: "C"
+},
+{
+soru: "13. Yatay düzlemde bir ipin ucunda döndürülen bir taşın merkezcil kuvvetini sağlayan nedir?",
+secenekler: { A: "Yerçekimi", B: "Sürtünme", C: "İp gerilmesi", D: "Normal kuvvet", E: "Hava direnci" },
+cevap: "C"
+},
+{
+soru: "14. Düşey düzlemde bir ipin ucunda döndürülen bir taşın en üst noktadaki merkezcil kuvvetini sağlayanlar nelerdir?",
+secenekler: { A: "Sadece ip gerilmesi", B: "Sadece ağırlık", C: "İp gerilmesi ve ağırlık", D: "İp gerilmesi eksi ağırlık", E: "Ağırlık eksi ip gerilmesi" },
+cevap: "C"
+},
+{
+soru: "15. Düşey düzlemde bir ipin ucunda döndürülen bir taşın en alt noktadaki merkezcil kuvvetini sağlayanlar nelerdir?",
+secenekler: { A: "Sadece ip gerilmesi", B: "Sadece ağırlık", C: "İp gerilmesi ve ağırlık", D: "İp gerilmesi eksi ağırlık", E: "Ağırlık eksi ip gerilmesi" },
+cevap: "D"
+},
+{
+soru: "16. Virajı dönen bir aracın güvenli bir şekilde dönebilmesi için gereken merkezcil kuvveti sağlayan nedir?",
+secenekler: { A: "Motorun gücü", B: "Fren kuvveti", C: "Sürtünme kuvveti", D: "Yerçekimi kuvveti", E: "Rüzgar direnci" },
+cevap: "C"
+},
+{
+soru: "17. Dünya'nın Güneş etrafındaki hareketi hangi tür bir harekettir (yaklaşık olarak)?",
+secenekler: { A: "Doğrusal hareket", B: "Düzgün doğrusal hareket", C: "Çembersel hareket", D: "Elips hareketi", E: "Parabolik hareket" },
+cevap: "D"
+},
+{
+soru: "18. Uydu hareketlerinde merkezcil kuvveti sağlayan nedir?",
+secenekler: { A: "Motor itmesi", B: "Hava sürtünmesi", C: "Yerçekimi kuvveti", D: "Normal kuvvet", E: "Manyetik kuvvet" },
+cevap: "C"
+},
+{
+soru: "19. Açısal momentum hangi niceliklerin çarpımı ile bulunur?",
+secenekler: { A: "Kütle ve hız", B: "Kuvvet ve zaman", C: "Eylemsizlik momenti ve açısal hız", D: "Enerji ve zaman", E: "Kütle ve ivme" },
+cevap: "C"
+},
+{
+soru: "20. Çembersel harekette açısal momentum korunur mu?",
+secenekler: { A: "Her zaman", B: "Asla", C: "Net bir tork yoksa evet", D: "Merkezcil kuvvet varsa hayır", E: "Sürat sabitse evet" },
+cevap: "C"
+},
+{
+soru: "21. Eylemsizlik momenti nelere bağlıdır?",
+secenekler: { A: "Sadece kütle", B: "Sadece hız", C: "Kütle ve kütlenin dönme eksenine göre dağılımı", D: "Sadece dönme hızı", E: "Sadece uygulanan tork" },
+cevap: "C"
+},
+{
+soru: "22. Dönme kinetik enerjisi nasıl hesaplanır?",
+secenekler: { A: "1/2 * mv²", B: "mgh", C: "1/2 * I * ω²", D: "F * d", E: "qV" },
+cevap: "C"
+},
+{
+soru: "23. Bir disk dönerek ilerliyorsa hangi tür kinetik enerjilere sahiptir?",
+secenekler: { A: "Sadece öteleme", B: "Sadece dönme", C: "Öteleme ve potansiyel", D: "Dönme ve potansiyel", E: "Öteleme ve dönme" },
+cevap: "E"
+},
+{
+soru: "24. Bir cisme uygulanan tork neyin değişimine neden olur?",
+secenekler: { A: "Lineer momentum", B: "Kinetik enerji", C: "Açısal momentum", D: "Potansiyel enerji", E: "Hız" },
+cevap: "C"
+},
+{
+soru: "25. Jiroskopun dengede kalmasının temel prensibi nedir?",
+secenekler: { A: "Enerji korunumu", B: "Kütle korunumu", C: "Açısal momentumun korunumu", D: "Momentum korunumu", E: "Yereçekimi etkisi" },
+cevap: "C"
+},
+{
+soru: "26. Bir tekerleğin yuvarlanma hareketinde hangi noktası anlık olarak durur?",
+secenekler: { A: "En üst noktası", B: "Merkez noktası", C: "Yerle temas eden nokta", D: "Ön noktası", E: "Arka noktası" },
+cevap: "C"
+},
+{
+soru: "27. Basit harmonik hareket ile düzgün çembersel hareket arasında nasıl bir ilişki vardır?",
+secenekler: { A: "Aralarında bir ilişki yoktur", B: "Aynı fiziksel prensiplere dayanırlar", C: "İzdüşümleri basit harmonik harekettir", D: "Basit harmonik hareket çembersel hareketin özel bir durumudur", E: "Çembersel hareket basit harmonik hareketin özel bir durumudur" },
+cevap: "C"
+},
+{
+soru: "28. Merkezkaç kuvveti gerçek bir kuvvet midir?",
+secenekler: { A: "Evet, merkezin dışına doğru etki eder", B: "Evet, eylemsizlik kuvvetidir", C: "Hayır, eylemsizlikten kaynaklanan sanal bir kuvvettir", D: "Evet, merkezcil kuvvetin tepki kuvvetidir", E: "Hayır, sadece dönen referans sistemlerinde tanımlanır" },
+cevap: "C"
+},
+{
+soru: "29. Bir dönme dolabın kabinlerindeki bir yolcu hangi tür bir ivme hisseder?",
+secenekler: { A: "Doğrusal ivme", B: "Açısal ivme", C: "Merkezcil ivme", D: "Teğetsel ivme", E: "Sürtünme ivmesi" },
+cevap: "C"
+},
+{
+soru: "30. Aynı açısal hızla dönen farklı yarıçaplı iki disk üzerindeki noktaların hangi nicelikleri farklıdır?",
+secenekler: { A: "Açısal hızları", B: "Periyotları", C: "Frekansları", D: "Doğrusal hızları ve merkezcil ivmeleri", E: "Açısal ivmeleri" },
+cevap: "D"
+},
+{
+soru: "31. Farklı açısal hızlarla dönen aynı yarıçaplı iki disk üzerindeki noktaların hangi nicelikleri farklıdır?",
+secenekler: { A: "Yarıçapları", B: "Periyotları aynıdır", C: "Doğrusal hızları ve merkezcil ivmeleri", D: "Frekansları aynıdır", E: "Eylemsizlik momentleri aynıdır" },
+cevap: "C"
+},
+{
+soru: "32. Bir cisme etki eden net tork sıfır ise hangi niceliği sabittir?",
+secenekler: { A: "Kinetik enerjisi", B: "Lineer momentumu", C: "Açısal momentumu", D: "Potansiyel enerjisi", E: "Hızı" },
+cevap: "C"
+},
+{
+soru: "33. Buz pateni yapan bir sporcu kollarını içeri çektiğinde açısal hızı neden artar?",
+secenekler: { A: "Kütlesi azalır", B: "Eylemsizlik momenti artar, açısal momentum korunur", C: "Eylemsizlik momenti azalır, açısal momentum korunur", D: "Uygulanan tork artar", E: "Enerjisi artar" },
+cevap: "C"
+},
+{
+soru: "34. Bir gezegenin Güneş etrafındaki yörüngesi tam olarak çember şeklinde midir?",
+secenekler: { A: "Evet, her zaman", B: "Hayır, parabol şeklindedir", C: "Hayır, hiperbol şeklindedir", D: "Hayır, elips şeklindedir", E: "Sadece bazı gezegenlerin yörüngesi çemberdir" },
+cevap: "D"
+},
+{
+soru: "35. Kepler'in ikinci yasası (alanlar yasası) hangi fiziksel ilkenin bir sonucudur?",
+secenekler: { A: "Enerji korunumu", B: "Momentum korunumu", C: "Açısal momentumun korunumu", D: "Kütle çekim yasası", E: "Eylemsizlik prensibi" },
+cevap: "C"
+},
+{
+soru: "36. Bir uydu daha yüksek bir yörüngeye çıkarılırsa hızı nasıl değişir?",
+secenekler: { A: "Artar", B: "Azalır", C: "Değişmez", D: "Sıfır olur", E: "Önce artar sonra azalır" },
+cevap: "B"
+},
+{
+soru: "37. Gezegenlerin Güneş etrafındaki dönüş periyotları ile yörünge yarıçapları arasında nasıl bir ilişki vardır (Kepler'in üçüncü yasası)?",
+secenekler: { A: "T ∝ r", B: "T² ∝ r", C: "T ∝ r²", D: "T² ∝ r³", E: "T³ ∝ r²" },
+cevap: "D"
+},
+{
+soru: "38. Bir parçacığın dönme eksenine göre eylemsizlik momenti nasıl hesaplanır?",
+secenekler: { A: "mv", B: "ma", C: "mr²", D: "1/2 mv²", E: "mgh" },
+cevap: "C"
+},
+{
+soru: "39. Farklı kütlelere sahip ancak aynı yarıçapta ve aynı açısal hızla dönen iki diskin hangi niceliği farklıdır?",
+secenekler: { A: "Açısal hızları", B: "Periyotları", C: "Frekansları", D: "Doğrusal hızları", E: "Dönme kinetik enerjileri ve açısal momentumları" },
+cevap: "E"
+},
+{
+soru: "40. Bir kasnağın etrafına sarılı ipin ucundaki yük serbest bırakılırsa kasnağın açısal ivmesi nasıl belirlenir?",
+secenekler: { A: "F = ma", B: "E = mc²", C: "tork = Iα", D: "P = F/A", E: "V = IR" },
+cevap: "C"
+},
+{
+soru: "41. Bir otomobilin virajı güvenli bir şekilde dönebilmesi için lastikler ile zemin arasındaki sürtünme kuvveti hangi değeri aşmamalıdır?",
+secenekler: { A: "Kinetik sürtünme kuvveti", B: "Statik sürtünme kuvveti", C: "Maksimum kinetik sürtünme kuvveti", D: "Minimum statik sürtünme kuvveti", E: "Maksimum statik sürtünme kuvveti" },
+cevap: "E"
+},
+{
+soru: "42. Yatay bir tablada dönen bir cismin düşmemesini sağlayan nedir?",
+secenekler: { A: "Yerçekimi kuvveti", B: "Normal kuvvet", C: "Merkezcil kuvveti sağlayan sürtünme kuvveti", D: "Hava direnci", E: "Manyetik kuvvet" },
+cevap: "C"
+},
+{
+soru: "43. Eğik bir virajda, aracın güvenli dönüşü için merkezcil kuvveti sağlayanlar nelerdir?",
+secenekler: { A: "Sadece sürtünme kuvveti", B: "Sadece yerçekimi kuvvetinin yatay bileşeni", C: "Yerçekimi kuvvetinin yatay bileşeni ve sürtünme kuvveti", D: "Sadece normal kuvvetin yatay bileşeni", E: "Motorun itme kuvveti" },
+cevap: "C"
+},
+{
+soru: "44. Bir bisiklet tekerleği dönerken üzerindeki bir noktanın hızı hangi iki hızın bileşkesidir?",
+secenekler: { A: "Sadece öteleme hızı", B: "Sadece dönme hızı", C: "Öteleme hızı ve dönme hızı", D: "Açısal hız ve doğrusal hız", E: "Merkezcil hız ve teğetsel hız" },
+cevap: "C"
+},
+{
+soru: "45. Bir top yere düşerken hem dönüyor hem de öteliyorsa toplam kinetik enerjisi nasıl ifade edilir?",
+secenekler: { A: "Sadece öteleme kinetik enerjisi", B: "Sadece dönme kinetik enerjisi", C: "Öteleme kinetik enerjisi + potansiyel enerji", D: "Dönme kinetik enerjisi + potansiyel enerji", E: "Öteleme kinetik enerjisi + dönme kinetik enerjisi" },
+cevap: "E"
+},
+{
+soru: "46. Bir silindir eğimli bir düzlemden kaymadan yuvarlanıyorsa hangi kuvvet sürtünme kuvvetine eşittir?",
+secenekler: { A: "Normal kuvvet", B: "Ağırlık", C: "Yerçekimi kuvvetinin eğim boyunca bileşeni", D: "Merkezcil kuvvet", E: "Tepki kuvveti" },
+cevap: "C"
+},
+{
+soru: "47. Bir tahterevallinin dengede kalması hangi fiziksel prensibe dayanır?",
+secenekler: { A: "Enerji korunumu", B: "Momentum korunumu", C: "Tork dengesi", D: "Kütle merkezi prensibi", E: "Eylemsizlik prensibi" },
+cevap: "C"
+},
+{
+soru: "48. Bir kapının menteşeleri etrafında dönmesi hangi fiziksel büyüklük ile açıklanır?",
+secenekler: { A: "Kuvvet", B: "Enerji", C: "İş", D: "Tork", E: "Momentum" },
+cevap: "D"
+},
+{
+soru: "49. Sabit açısal ivme ile dönen bir cismin açısal hızı zamanla nasıl değişir?",
+secenekler: { A: "Sabit kalır", B: "Üstel olarak artar", C: "Doğrusal olarak artar", D: "Ters orantılı olarak azalır", E: "Karesiyle orantılı olarak artar" },
+cevap: "C"
+},
+{
+soru: "50. Hem öteleme hem de dönme hareketi yapan bir cismin kütle merkezinin hareketi hangi fiziksel yasalara göre incelenir?",
+secenekler: { A: "Sadece dönme hareket yasalarına", B: "Sadece öteleme hareket yasalarına", C: "Newton'ın hareket yasalarına", D: "Açısal momentumun korunumu yasasına", E: "Enerji korunumu yasasına" },
+cevap: "C"
+}
+];
+
+let currentQuestionIndex = 0;
+const soruAlani = document.getElementById("soru-alani");
+const seceneklerDiv = document.querySelector(".secenekler");
+const secenekler = {
+A: document.getElementById("labelA"),
+B: document.getElementById("labelB"),
+C: document.getElementById("labelC"),
+D: document.getElementById("labelD"),
+E: document.getElementById("labelE")
+};
+const cevapRadioButtons = document.querySelectorAll('input\[name="cevap"]');
+const sonucParagraf = document.getElementById("sonuc");
+const sonrakiButton = document.getElementById("sonraki-soru");
+const cevapAlaniDiv = document.getElementById("cevap-alani");
+
+function soruyuGoster() {
+console.log('soruyuGoster fonksiyonu çalıştı');
+if (currentQuestionIndex < sorular.length) {
+const currentQuestion = sorular?.[currentQuestionIndex];
+console.log('Gösterilecek soru:', currentQuestion);
+soruAlani.innerText = currentQuestion.soru;
+secenekler.A.innerText = currentQuestion.secenekler.A;
+secenekler.B.innerText = currentQuestion.secenekler.B;
+secenekler.C.innerText = currentQuestion.secenekler.C;
+secenekler.D.innerText = currentQuestion.secenekler.D;
+secenekler.E.innerText = currentQuestion.secenekler.E;
+sonucParagraf.innerText = "";
+sonrakiButton.disabled = true;
+cevapRadioButtons.forEach(radio => radio.checked = false);
+cevapAlaniDiv.style.display = "block";
+} else {
+soruAlani.innerText = "Test tamamlandı!";
+cevapAlaniDiv.style.display = "none";
+sonrakiButton.style.display = "none";
+}
+}
+
+function kontrolEt() {
+const selectedAnswer = document.querySelector('input\[name="cevap"]:checked');
+if (selectedAnswer) {
+if (selectedAnswer.value === sorular?.[currentQuestionIndex]?.cevap) {
+sonucParagraf.innerText = "Doğru!";
+sonrakiButton.disabled = false;
+} else {
+sonucParagraf.innerText = `Yanlış. Doğru cevap: ${sorular?.[currentQuestionIndex]?.cevap} seçeneği.`;
+sonrakiButton.disabled = true;
+}
+} else {
+sonucParagraf.innerText = "Lütfen bir cevap seçin.";
+}
+}
+
+function sonrakiSoru() {
+currentQuestionIndex++;
+soruyuGoster();
+}
+
+soruyuGoster();
+</script>
+</body>
+</html>
